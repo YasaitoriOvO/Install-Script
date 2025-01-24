@@ -45,7 +45,6 @@ KIBANA_PASSWORD="$KIBANA_PASSWORD"
 EOL
 fi
 
-# 打印美观的分隔线
 echo "============================================="
 echo "准备开始安装 MongoDB 和 Elasticsearch"
 echo "============================================="
@@ -57,7 +56,7 @@ sudo apt-get upgrade -y
 sudo apt-get install -y wget curl gnupg openssl
 
 # 安装 MongoDB
-function install_mongodb {
+install_mongodb() {
     echo "安装 MongoDB..."
     wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
     echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
@@ -78,7 +77,7 @@ EOF
 }
 
 # 安装 Elasticsearch 和 Kibana
-function install_elasticsearch {
+install_elasticsearch() {
     echo "安装 Elasticsearch..."
     wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
     echo "deb https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list

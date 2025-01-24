@@ -61,6 +61,12 @@ install_mongodb() {
     wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
     echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
     sudo apt-get update -y
+
+    # 下载并安装 libssl1.1
+    echo "下载并安装 libssl1.1..."
+    wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+    sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
+
     sudo apt-get install -y mongodb-org
 
     echo "配置 MongoDB 复制集..."
@@ -107,10 +113,10 @@ EOL"
 
     echo "配置 Kibana..."
     sudo bash -c "cat >> /etc/kibana/kibana.yml <<EOL
-server.host: "0.0.0.0"
-elasticsearch.hosts: ["https://localhost:$ES_PORT"]
+server.host: \"0.0.0.0\"
+elasticsearch.hosts: [\"https://localhost:$ES_PORT\"]
 elasticsearch.ssl:
-  certificateAuthorities: ["/etc/elasticsearch/certs/elasticsearch.crt"]
+  certificateAuthorities: [\"/etc/elasticsearch/certs/elasticsearch.crt\"]
 EOL"
 
     sudo systemctl enable kibana

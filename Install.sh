@@ -58,23 +58,20 @@ sudo apt-get install -y wget curl gnupg openssl
 # 安装 MongoDB
 install_mongodb() {
     echo "安装 MongoDB..."
-    wget -qO - https://www.mongodb.org/static/pgp/server-6.0.asc | sudo apt-key add -
-    echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu focal/mongodb-org/6.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-6.0.list
+    sudo apt-get install gnupg curl
+    curl -fsSL https://www.mongodb.org/static/pgp/server-8.0.asc | \
+      sudo gpg -o /usr/share/keyrings/mongodb-server-8.0.gpg \
+      --dearmor
+    echo "deb [ arch=amd64,arm64 signed-by=/usr/share/keyrings/mongodb-server-8.0.gpg ] https://repo.mongodb.org/apt/ubuntu jammy/mongodb-org/8.0 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-8.0.list
     sudo apt-get update -y
-
-    # 下载并安装 libssl1.1
-    echo "下载并安装 libssl1.1..."
-    wget http://archive.ubuntu.com/ubuntu/pool/main/o/openssl/libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
-    sudo dpkg -i libssl1.1_1.1.1f-1ubuntu2.16_amd64.deb
-
     sudo apt-get install -y mongodb-org
 
-    echo "配置 MongoDB 复制集..."
-    sudo systemctl start mongod
+    echo "启动并启用 MongoDB 服务..."
+    sudo systemctl start mongod 
     sudo systemctl enable mongod
 
+    echo "配置 MongoDB 用户..."
     mongo <<EOF
-rs.initiate()
 use $MONGODB_NAME
 db.createUser({user: "$MONGODB_USERNAME", pwd: "$MONGODB_PASSWORD", roles: [{role: "readWrite", db: "$MONGODB_NAME"}]})
 EOF
@@ -85,8 +82,10 @@ EOF
 # 安装 Elasticsearch 和 Kibana
 install_elasticsearch() {
     echo "安装 Elasticsearch..."
-    wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
-    echo "deb https://artifacts.elastic.co/packages/8.x/apt stable main" | sudo tee /etc/apt/sources.list.d/elastic-8.x.list
+    wget -qO - https://artifacts.elastic.co/GPG-KEY-elasticsearch | \
+        gpg --dearmor -o /usr/share/keyrings/elasticsearch-archive-keyring.gpg
+    echo "deb [arch=amd64,arm64 signed-by=/usr/share/keyrings/elasticsearch-archive-keyring.gpg] https://artifacts.elastic.co/packages/8.x/apt stable main" | \
+        sudo tee /etc/apt/sources.list.d/elastic-8.x.list
     sudo apt-get update -y
     sudo apt-get install -y elasticsearch kibana
 
@@ -149,16 +148,6 @@ install_elasticsearch
 echo "MongoDB 和 Elasticsearch 部署完成！" > /DONE.txt
 echo "MongoDB Name: $MONGODB_NAME" >> /DONE.txt
 echo "MongoDB Username: $MONGODB_USERNAME" >> /DONE.txt
-echo "MongoDB Password: $MONGODB_PASSWORD" >> /DONE.txt
-echo "MongoDB Cluster Port: $MONGODB_CLUSTER_PORT" >> /DONE.txt
-
-echo "Elasticsearch Port: $ES_PORT" >> /DONE.txt
-echo "Elasticsearch Admin Username: $ES_ADMIN_USERNAME" >> /DONE.txt
-echo "Elasticsearch Admin Password: $ES_ADMIN_PASSWORD" >> /DONE.txt
-echo "Kibana Admin Username: $KIBANA_USERNAME" >> /DONE.txt
-echo "Kibana Admin Password: $KIBANA_PASSWORD" >> /DONE.txt
-
-# 打印完成信息
-echo "============================================="
-echo "安装完成！配置已保存到 /DONE.txt"
-echo "============================================="
+echo "MongoDB Password:
+::contentReference[oaicite:0]{index=0}
+ 
